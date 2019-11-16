@@ -2,7 +2,10 @@ package echarts
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/go-echarts/go-echarts/charts"
+	"github.com/go-echarts/go-echarts/datasets"
+	"github.com/go-echarts/go-echarts/templates"
 	"html/template"
 	"strings"
 )
@@ -12,6 +15,16 @@ type Chart struct {
 }
 
 func NewChart() *Chart {
+
+	templates.BaseTpl = List["base"]
+	templates.ChartTpl = List["chart"]
+	templates.HeaderTpl = List["header"]
+	templates.PageTpl = List["page"]
+	templates.RoutersTpl = List["routes"]
+
+	_ = json.Unmarshal([]byte(coorJson), &datasets.Coordinates)
+	_ = json.Unmarshal([]byte(mapfileName), &datasets.MapFileNames)
+
 	return new(Chart)
 }
 
