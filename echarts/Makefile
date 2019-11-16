@@ -1,6 +1,6 @@
 CLI=adm
 
-all: run
+all: asset
 
 asset:
 	$(CLI) compile asset -s=./assets/ -d=./ -p=echarts

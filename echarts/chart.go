@@ -2,73 +2,26 @@ package echarts
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/GoAdminGroup/go-admin/modules/language"
-	"github.com/GoAdminGroup/go-admin/modules/logger"
+	"github.com/go-echarts/go-echarts/charts"
 	"html/template"
+	"strings"
 )
 
 type Chart struct {
-	ID     string
-	Title  template.HTML
-	Js     template.JS
-	Height int
-	Width  int
-
-	JsContentOptions *Options
+	Content interface{}
 }
-
-func (c *Chart) SetID(id string) *Chart {
-	c.ID = id
-	return c
-}
-
-func (c *Chart) SetTitle(title template.HTML) *Chart {
-	c.Title = title
-	return c
-}
-
-func (c *Chart) SetHeight(height int) *Chart {
-	c.Height = height
-	return c
-}
-
-func (c *Chart) SetWidth(width int) *Chart {
-	c.Width = width
-	return c
-}
-
-type Options struct {
-}
-
-type Color string
 
 func NewChart() *Chart {
 	return new(Chart)
 }
 
+func (c *Chart) SetContent(content interface{}) *Chart {
+	c.Content = content
+	return c
+}
+
 func (c *Chart) GetTemplate() (*template.Template, string) {
-	tmpl, err := template.New("echarts").
-		Funcs(template.FuncMap{
-			"lang":     language.Get,
-			"langHtml": language.GetFromHtml,
-			"link": func(cdnUrl, prefixUrl, assetsUrl string) string {
-				if cdnUrl == "" {
-					return prefixUrl + assetsUrl
-				}
-				return cdnUrl + assetsUrl
-			},
-			"isLinkUrl": func(s string) bool {
-				return (len(s) > 7 && s[:7] == "http://") || (len(s) > 8 && s[:8] == "https://")
-			},
-		}).
-		Parse(List["echarts"])
-
-	if err != nil {
-		logger.Error("Chart GetTemplate Error: ", err)
-	}
-
-	return tmpl, "echarts"
+	return nil, "echarts"
 }
 
 func (c *Chart) GetAssetList() []string {
@@ -88,11 +41,117 @@ func (c *Chart) GetName() string {
 }
 
 func (c *Chart) GetContent() template.HTML {
-	buffer := new(bytes.Buffer)
-	tmpl, defineName := c.GetTemplate()
-	err := tmpl.ExecuteTemplate(buffer, defineName, c)
-	if err != nil {
-		fmt.Println("ComposeHtml Error:", err)
+
+	buf := new(bytes.Buffer)
+
+	if line, ok := c.Content.(*charts.Line); ok {
+		_ = line.Render(buf)
 	}
-	return template.HTML(buffer.String())
+
+	if bar, ok := c.Content.(*charts.Bar); ok {
+		_ = bar.Render(buf)
+	}
+
+	if bar3d, ok := c.Content.(*charts.Bar3D); ok {
+		_ = bar3d.Render(buf)
+	}
+
+	if box, ok := c.Content.(*charts.BoxPlot); ok {
+		_ = box.Render(buf)
+	}
+
+	if chart3d, ok := c.Content.(*charts.Chart3D); ok {
+		_ = chart3d.Render(buf)
+	}
+
+	if rc, ok := c.Content.(*charts.RectChart); ok {
+		_ = rc.Render(buf)
+	}
+
+	if ef, ok := c.Content.(*charts.EffectScatter); ok {
+		_ = ef.Render(buf)
+	}
+
+	if fu, ok := c.Content.(*charts.Funnel); ok {
+		_ = fu.Render(buf)
+	}
+
+	if ga, ok := c.Content.(*charts.Gauge); ok {
+		_ = ga.Render(buf)
+	}
+
+	if geo, ok := c.Content.(*charts.Geo); ok {
+		_ = geo.Render(buf)
+	}
+
+	if graph, ok := c.Content.(*charts.Graph); ok {
+		_ = graph.Render(buf)
+	}
+
+	if hm, ok := c.Content.(*charts.HeatMap); ok {
+		_ = hm.Render(buf)
+	}
+
+	if kl, ok := c.Content.(*charts.Kline); ok {
+		_ = kl.Render(buf)
+	}
+
+	if line3d, ok := c.Content.(*charts.Line3D); ok {
+		_ = line3d.Render(buf)
+	}
+
+	if li, ok := c.Content.(*charts.Liquid); ok {
+		_ = li.Render(buf)
+	}
+
+	if ma, ok := c.Content.(*charts.Map); ok {
+		_ = ma.Render(buf)
+	}
+
+	if pa, ok := c.Content.(*charts.Parallel); ok {
+		_ = pa.Render(buf)
+	}
+
+	if pi, ok := c.Content.(*charts.Pie); ok {
+		_ = pi.Render(buf)
+	}
+
+	if ra, ok := c.Content.(*charts.Radar); ok {
+		_ = ra.Render(buf)
+	}
+
+	if sk, ok := c.Content.(*charts.Sankey); ok {
+		_ = sk.Render(buf)
+	}
+
+	if sc, ok := c.Content.(*charts.Scatter); ok {
+		_ = sc.Render(buf)
+	}
+
+	if sc3d, ok := c.Content.(*charts.Scatter3D); ok {
+		_ = sc3d.Render(buf)
+	}
+
+	if su, ok := c.Content.(*charts.Surface3D); ok {
+		_ = su.Render(buf)
+	}
+
+	if tr, ok := c.Content.(*charts.ThemeRiver); ok {
+		_ = tr.Render(buf)
+	}
+
+	if wc, ok := c.Content.(*charts.WordCloud); ok {
+		_ = wc.Render(buf)
+	}
+
+	content := buf.String()
+
+	content = strings.Replace(content, `<meta charset="utf-8">`, "", -1)
+	content = strings.Replace(content, `<title>Awesome go-echarts</title>`, "", -1)
+	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>`, "", -1)
+	content = strings.Replace(content, `<link href="https://go-echarts.github.io/go-echarts-assets/assets/bulma.min.css" rel="stylesheet">`, "", -1)
+	content = strings.Replace(content, `<div class="select" style="margin-right:10px; margin-top:10px; position:fixed; right:10px;"></div>`, "", - 1)
+	content = strings.Replace(content, `container`, "echarts-container", - 1)
+
+	return template.HTML(content)
 }
