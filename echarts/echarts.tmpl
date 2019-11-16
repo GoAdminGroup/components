@@ -1,0 +1,7 @@
+{{define "echarts"}}
+    <div class="echarts" style="width: {{.Width}}px;height:{{.Height}}px;" id="{{.ID}}"></div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('{{.ID}}'));
+        myChart.setOption({{.Js}});
+    </script>
+{{end}}
