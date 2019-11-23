@@ -162,6 +162,7 @@ func (c *Chart) GetContent() template.HTML {
 	content = strings.Replace(content, `<meta charset="utf-8">`, "", -1)
 	content = strings.Replace(content, `<title>Awesome go-echarts</title>`, "", -1)
 	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>`, "", -1)
+	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-gl.min.js"></script>`, "", -1)
 	content = strings.Replace(content, `<link href="https://go-echarts.github.io/go-echarts-assets/assets/bulma.min.css" rel="stylesheet">`, "", -1)
 	content = strings.Replace(content, `<div class="select" style="margin-right:10px; margin-top:10px; position:fixed; right:10px;"></div>`, "", - 1)
 	content = strings.Replace(content, `container`, "echarts-container", - 1)
