@@ -15,6 +15,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
         <style>
             body.login-page {
                 background-color: {% .BackgroundColor %};
+                height: 80%;
             }
 
             div.login-logo a {
