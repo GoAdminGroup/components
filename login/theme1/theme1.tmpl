@@ -12,7 +12,7 @@
 
         <style>
             body.login-page {
-                background-color: #2d3a4b;
+                background-color: {% .BackgroundColor %};
             }
 
             div.login-logo a {
@@ -28,7 +28,7 @@
             }
 
             button.btn.btn-flat {
-                background-color: #6a83a2;
+                background-color: {% .LoginBtnColor %};
             }
         </style>
 
@@ -72,8 +72,43 @@
 
     <script src="{{link .CdnUrl .UrlPrefix "/assets/login/dist/all.min.js"}}"></script>
     <script>
+
+        {% if .TencentWaterProofWallID  %}
+
+        let captcha = new TencentCaptcha("{% .TencentWaterProofWallID %}", function (res) {
+            console.log(res);
+            // res（用户主动关闭验证码）= {ret: 2, ticket: null}
+            // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+            if (res.ret === 0) {
+                $.ajax({
+                    dataType: 'json',
+                    type: 'POST',
+                    url: '{{.UrlPrefix}}/signin',
+                    async: 'true',
+                    data: {
+                        'username': $("#username").val(),
+                        'password': $("#password").val(),
+                        'token': res.ticket
+                    },
+                    success: function (data) {
+                        location.href = data.data.url
+                    },
+                    error: function (data) {
+                        alert('{{lang "login fail"}}');
+                    }
+                });
+            } else {
+                alert("验证失败")
+            }
+        }, {});
+
+        {% end %}
+
         $("#sign-in-form").submit(function (e) {
             e.preventDefault();
+            {% if .TencentWaterProofWallID  %}
+            captcha.show();
+            {% else  %}
             $.ajax({
                 dataType: 'json',
                 type: 'POST',
@@ -90,6 +125,7 @@
                     alert("Login failed");
                 }
             });
+            {% end %}
         });
     </script>
 
