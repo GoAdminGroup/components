@@ -3,13 +3,8 @@ package login
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"strings"
 	textTemplate "text/template"
 	"time"
 
@@ -36,120 +31,22 @@ func Register(key string, theme Theme) {
 }
 
 type Login struct {
-	TencentWaterProofWallData TencentWaterProofWallData
-	CaptchaDigits             int
-	CaptchaID                 string
-	CaptchaImgSrc             string
-	Theme                     string
+	TencentWaterProofWallData TencentWaterProofWallData `json:"tencent_water_proof_wall_data"`
+	CaptchaDigits             int                       `json:"captcha_digits"`
+	CaptchaID                 string                    `json:"captcha_id"`
+	CaptchaImgSrc             string                    `json:"captcha_img_src"`
+	Theme                     string                    `json:"theme"`
 }
 
 type TencentWaterProofWallData struct {
-	ID           string
-	AppID        string
-	AppSecretKey string
+	AppID     string `json:"app_id"`
+	AppSecret string `json:"app_secret"`
 }
 
 type Config struct {
-	TencentWaterProofWallData TencentWaterProofWallData
-	CaptchaDigits             int
-	Theme                     string
-}
-
-const (
-	CaptchaDriverKeyTencent = "tencent"
-	CaptchaDriverKeyDefault = "digits"
-
-	CaptchaDisableDuration = time.Minute * 2
-)
-
-type CaptchaDataItem struct {
-	Time time.Time
-	Data string
-	Num  int
-}
-
-type CaptchaData map[string]CaptchaDataItem
-
-func (c *CaptchaData) Clean() {
-	for key, value := range *c {
-		if value.Time.Add(CaptchaDisableDuration).Before(time.Now()) {
-			delete(*c, key)
-		}
-	}
-}
-
-var captchaData = make(CaptchaData)
-
-type DigitsCaptcha struct{}
-
-func (c *DigitsCaptcha) Validate(token string) bool {
-	tokenArr := strings.Split(token, ",")
-	if len(tokenArr) < 2 {
-		return false
-	}
-	if v, ok := captchaData[tokenArr[1]]; ok {
-		if v.Data == tokenArr[0] {
-			delete(captchaData, tokenArr[1])
-			return true
-		} else {
-			v.Num++
-			captchaData[tokenArr[1]] = v
-			return false
-		}
-	}
-	return false
-}
-
-type TencentCaptcha struct {
-	Aid       string
-	AppSecret string
-}
-
-type TencentCaptchaRes struct {
-	Response  string `json:"response"`
-	EvilLevel string `json:"evil_level"`
-	ErrMsg    string `json:"err_msg"`
-}
-
-func (c *TencentCaptcha) Validate(token string) bool {
-
-	u := "https://ssl.captcha.qq.com/ticket/verify?"
-
-	v := url.Values{
-		"aid":          {c.Aid},
-		"AppSecretKey": {c.AppSecret},
-		"Ticket":       {token},
-		"Randstr":      {utils.Uuid(10)},
-		"UserIP":       {"127.0.0.1"},
-	}
-
-	req, err := http.NewRequest("GET", u+v.Encode(), nil)
-	if err != nil {
-		return false
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return false
-	}
-
-	defer func() {
-		_ = res.Body.Close()
-	}()
-	body, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return false
-	}
-
-	var captchaRes TencentCaptchaRes
-	err = json.Unmarshal(body, &captchaRes)
-
-	if err != nil {
-		return false
-	}
-
-	return captchaRes.Response == "1"
+	TencentWaterProofWallData TencentWaterProofWallData `json:"tencent_water_proof_wall_data"`
+	CaptchaDigits             int                       `json:"captcha_digits"`
+	Theme                     string                    `json:"theme"`
 }
 
 func Init(cfg ...Config) {
@@ -159,13 +56,16 @@ func Init(cfg ...Config) {
 func Get(cfg ...Config) *Login {
 	if len(cfg) > 0 {
 
-		if cfg[0].CaptchaDigits != 0 && cfg[0].TencentWaterProofWallData.ID == "" {
+		if cfg[0].CaptchaDigits != 0 && cfg[0].TencentWaterProofWallData.AppID == "" {
 			captchaData.Clean()
 			captcha2.Add(CaptchaDriverKeyDefault, new(DigitsCaptcha))
 		}
 
-		if cfg[0].TencentWaterProofWallData.ID != "" {
-			captcha2.Add(CaptchaDriverKeyTencent, new(TencentCaptcha))
+		if cfg[0].TencentWaterProofWallData.AppID != "" {
+			captcha2.Add(CaptchaDriverKeyTencent, &TencentCaptcha{
+				AppID:     cfg[0].TencentWaterProofWallData.AppID,
+				AppSecret: cfg[0].TencentWaterProofWallData.AppSecret,
+			})
 		}
 
 		if cfg[0].Theme == "" {

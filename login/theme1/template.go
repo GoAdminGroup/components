@@ -48,7 +48,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
         </div>
 
         <div class="login-box-body">
-            <form action="{{.UrlPrefix}}/signin" id="sign-in-form">
+            <form action="##" method="post" onsubmit="return false" id="sign-in-form">
                 <div class="form-group has-feedback 1">
                     <input type="text" class="form-control" placeholder="{{lang "username"}}" id="username">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
@@ -74,7 +74,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                     <div class="col-xs-8">
                     </div>
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">{{lang "login"}}</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat" onclick="submitData()">{{lang "login"}}</button>
                     </div>
                 </div>
             </form>
@@ -84,19 +84,23 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
     <div class="text-center text-muted">
         <small>
-            <strong>Powered by <a href="https://github.com/z-song/laravel-admin"
+            <strong>Powered by <a href="https://github.com/GoAdminGroup/go-admin"
                                   target="_blank">GoAdmin</a></strong>
         </small>
     </div>
 
     </body>
 
+    {% if .TencentWaterProofWallData.AppID  %}
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+    {% end %}
+
     <script src="{{link .CdnUrl .UrlPrefix "/assets/login/dist/all.min.js"}}"></script>
     <script>
 
-        {% if .TencentWaterProofWallData.ID  %}
+        {% if .TencentWaterProofWallData.AppID  %}
 
-        let captcha = new TencentCaptcha("{% .TencentWaterProofWallData.ID %}", function (res) {
+        let captcha = new TencentCaptcha("{% .TencentWaterProofWallData.AppID %}", function (res) {
             console.log(res);
             // res（用户主动关闭验证码）= {ret: 2, ticket: null}
             // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
@@ -133,11 +137,10 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
         {% end %}
 
-        $("#sign-in-form").submit(function (e) {
-            e.preventDefault();
-            {% if .TencentWaterProofWallData.ID  %}
+        function submitData() {
+            {% if .TencentWaterProofWallData.AppID  %}
             captcha.show();
-            {% else  %}
+            {% else %}
             $.ajax({
                 dataType: 'json',
                 type: 'POST',
@@ -158,9 +161,8 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                 }
             });
             {% end %}
-        });
+        }
     </script>
 
     </html>
-{{end}}
-`}
+{{end}}`}

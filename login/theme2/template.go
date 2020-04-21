@@ -25,21 +25,13 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
         <!--[if lt IE 9]>
         <script src="{{link .CdnUrl .UrlPrefix "/assets/login/dist/respond.min.js"}}"></script>
         <![endif]-->
-
-        <link rel="icon" type="image/png" sizes="32x32"
-              href="//quick.go-admin.cn/official/assets/imgs/icons.ico/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="96x96"
-              href="//quick.go-admin.cn/official/assets/imgs/icons.ico/favicon-64x64.png">
-        <link rel="icon" type="image/png" sizes="16x16"
-              href="//quick.go-admin.cn/official/assets/imgs/icons.ico/favicon-16x16.png">
-
     </head>
     <body>
 
     <div class="container">
         <div class="row" style="margin-top: 80px;">
             <div class="col-md-4 col-md-offset-4">
-                <form action="{{.UrlPrefix}}/signin" method="post" id="sign-up-form" class="fh5co-form animate-box"
+                <form onsubmit="return false" action="##" method="post" id="sign-up-form" class="fh5co-form animate-box"
                       data-animate-effect="fadeIn">
                     <h2>{{.Title}}</h2>
                     <div class="form-group">
@@ -66,7 +58,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                     </div>
                     {% end %}
                     <div class="form-group">
-                        <button class="btn btn-primary">{{lang "login"}}</button>
+                        <button class="btn btn-primary" onclick="submitData()">{{lang "login"}}</button>
                     </div>
                 </form>
             </div>
@@ -86,15 +78,15 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
     <script src="{{link .CdnUrl .UrlPrefix "/assets/login/dist/all.min.js"}}"></script>
 
-    {% if .TencentWaterProofWallData.ID  %}
+    {% if .TencentWaterProofWallData.AppID  %}
         <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
     {% end %}
 
     <script>
 
-        {% if .TencentWaterProofWallData.ID  %}
+        {% if .TencentWaterProofWallData.AppID  %}
 
-        let captcha = new TencentCaptcha("{% .TencentWaterProofWallData.ID %}", function (res) {
+        let captcha = new TencentCaptcha("{% .TencentWaterProofWallData.AppID %}", function (res) {
             // res（用户主动关闭验证码）= {ret: 2, ticket: null}
             // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
             if (res.ret === 0) {
@@ -106,7 +98,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                     data: {
                         'username': $("#username").val(),
                         'password': $("#password").val(),
-                        'token': res.ticket
+                        'token': res.ticket+","+res.randstr
                     },
                     success: function (data) {
                         location.href = data.data.url
@@ -130,9 +122,8 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
         {% end %}
 
-        $("#sign-in-form").submit(function (e) {
-            e.preventDefault();
-            {% if .TencentWaterProofWallData.ID  %}
+        function submitData() {
+            {% if .TencentWaterProofWallData.AppID  %}
             captcha.show();
             {% else  %}
             $.ajax({
@@ -142,20 +133,20 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                 async: 'true',
                 data: {
                     'username': $("#username").val(),
-            {% if .CaptchaDigits %}
-            'token': $("#captcha").val() + "," + $("#captcha_id").val(),
+                    {% if .CaptchaDigits %}
+                    'token': $("#captcha").val() + "," + $("#captcha_id").val(),
+                    {% end %}
+                    'password': $("#password").val()
+                },
+                success: function (data) {
+                    location.href = data.data.url
+                },
+                error: function (data) {
+                    alert(data.responseJSON.msg);
+                }
+             });
             {% end %}
-            'password': $("#password").val()
-        },
-            success: function (data) {
-                location.href = data.data.url
-            },
-            error: function (data) {
-                alert(data.responseJSON.msg);
-            }
-        });
-            {% end %}
-        });
+        }
     </script>
 
     </body>
