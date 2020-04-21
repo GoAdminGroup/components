@@ -33,6 +33,11 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
             button.btn.btn-flat {
                 background-color: {% .LoginBtnColor %};
             }
+
+            .captcha {
+                cursor: pointer;
+                border: 1px #e6e6e6 solid;
+            }
         </style>
 
     </head>
@@ -52,6 +57,19 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                     <input type="password" class="form-control" placeholder="{{lang "password"}}" id="password">
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
+                {% if .CaptchaDigits %}
+                    <div class="form-group has-feedback 1">
+                        <div class="row">
+                            <div class="col-xs-7">
+                                <input type="text" class="form-control" placeholder="{{lang "captcha"}}" id="captcha">
+                            </div>
+                            <div class="col-xs-5">
+                                <img class="captcha" src="{% .CaptchaImgSrc %}" alt="" width="110" height="34">
+                            </div>
+                        </div>
+                        <input type="hidden" value="{% .CaptchaID %}" id="captcha_id">
+                    </div>
+                {% end %}
                 <div class="row">
                     <div class="col-xs-8">
                     </div>
@@ -97,13 +115,21 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                         location.href = data.data.url
                     },
                     error: function (data) {
-                        alert('{{lang "login fail"}}');
+                        alert(data.responseJSON.msg);
                     }
                 });
             } else {
-                alert("验证失败")
+                alert(data.data.msg);
             }
         }, {});
+
+        {% end %}
+
+        {% if .CaptchaDigits %}
+
+        $(".captcha").on("click",function(){
+            location.reload();
+        });
 
         {% end %}
 
@@ -119,13 +145,16 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                 async: 'true',
                 data: {
                     'username': $("#username").val(),
+                    {% if .CaptchaDigits %}
+                        'token': $("#captcha").val() + "," + $("#captcha_id").val(),
+                    {% end %}
                     'password': $("#password").val()
                 },
                 success: function (data) {
                     location.href = data.data.url
                 },
                 error: function (data) {
-                    alert("Login failed");
+                    alert(data.responseJSON.msg);
                 }
             });
             {% end %}
@@ -133,4 +162,5 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
     </script>
 
     </html>
-{{end}}`}
+{{end}}
+`}
