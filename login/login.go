@@ -3,8 +3,12 @@ package login
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"strings"
 	textTemplate "text/template"
 	"time"
@@ -96,10 +100,56 @@ func (c *DigitsCaptcha) Validate(token string) bool {
 	return false
 }
 
-type TencentCaptcha struct{}
+type TencentCaptcha struct {
+	Aid       string
+	AppSecret string
+}
+
+type TencentCaptchaRes struct {
+	Response  string `json:"response"`
+	EvilLevel string `json:"evil_level"`
+	ErrMsg    string `json:"err_msg"`
+}
 
 func (c *TencentCaptcha) Validate(token string) bool {
-	return true
+
+	u := "https://ssl.captcha.qq.com/ticket/verify?"
+
+	v := url.Values{
+		"aid":          {c.Aid},
+		"AppSecretKey": {c.AppSecret},
+		"Ticket":       {token},
+		"Randstr":      {utils.Uuid(10)},
+		"UserIP":       {"127.0.0.1"},
+	}
+
+	req, err := http.NewRequest("GET", u+v.Encode(), nil)
+	if err != nil {
+		return false
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
+	body, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return false
+	}
+
+	var captchaRes TencentCaptchaRes
+	err = json.Unmarshal(body, &captchaRes)
+
+	if err != nil {
+		return false
+	}
+
+	return captchaRes.Response == "1"
 }
 
 func Init(cfg ...Config) {
