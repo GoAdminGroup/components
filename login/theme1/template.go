@@ -50,11 +50,11 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
         <div class="login-box-body">
             <form action="##" method="post" onsubmit="return false" id="sign-in-form">
                 <div class="form-group has-feedback 1">
-                    <input type="text" class="form-control" placeholder="{{lang "username"}}" id="username">
+                    <input type="text" required class="form-control" placeholder="{{lang "username"}}" id="username">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback 1">
-                    <input type="password" class="form-control" placeholder="{{lang "password"}}" id="password">
+                    <input type="password" required class="form-control" placeholder="{{lang "password"}}" id="password">
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
                 {% if .CaptchaDigits %}

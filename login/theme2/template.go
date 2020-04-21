@@ -36,12 +36,12 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
                     <h2>{{.Title}}</h2>
                     <div class="form-group">
                         <label for="username" class="sr-only">{{lang "username"}}</label>
-                        <input type="text" class="form-control" id="username" placeholder="{{lang "username"}}"
+                        <input type="text" required class="form-control" id="username" placeholder="{{lang "username"}}"
                                autocomplete="off" value="admin">
                     </div>
                     <div class="form-group">
                         <label for="password" class="sr-only">{{lang "password"}}</label>
-                        <input type="password" class="form-control" id="password" placeholder="{{lang "password"}}"
+                        <input type="password" required class="form-control" id="password" placeholder="{{lang "password"}}"
                                autocomplete="off" value="admin">
                     </div>
                     {% if .CaptchaDigits %}
