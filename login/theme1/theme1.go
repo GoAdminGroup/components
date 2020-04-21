@@ -11,5 +11,5 @@ func (*Theme1) GetAsset(name string) ([]byte, error) {
 }
 
 func (*Theme1) GetHTML() string {
-	return List["login/theme1"]
+	return List["login"]
 }

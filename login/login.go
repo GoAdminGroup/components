@@ -17,10 +17,8 @@ import (
 	"github.com/dchest/captcha"
 )
 
-var themes = make(map[string]Theme)
-
-func init() {
-	Register("theme1", new(theme1.Theme1))
+var themes = map[string]Theme{
+	"theme1": new(theme1.Theme1),
 }
 
 func Register(key string, theme Theme) {
@@ -106,7 +104,7 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 		l.CaptchaImgSrc = "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes())
 	}
 
-	t := textTemplate.New("login_theme1").Delims("{%", "%}")
+	t := textTemplate.New("login").Delims("{%", "%}")
 	t, err := t.Parse(themes[l.Theme].GetHTML())
 	if err != nil {
 		logger.Error("login component, get template parse error: ", err)
@@ -117,7 +115,7 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 		logger.Error("login component, get template execute error: ", err)
 	}
 
-	tmpl, err := template.New("login_theme1").
+	tmpl, err := template.New("login").
 		Funcs(login.DefaultFuncMap).
 		Parse(buf.String())
 
@@ -125,7 +123,7 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 		logger.Error("login component, get template error: ", err)
 	}
 
-	return tmpl, "login_theme1"
+	return tmpl, "login"
 }
 
 func (l *Login) GetAssetList() []string               { return themes[l.Theme].GetAssetList() }

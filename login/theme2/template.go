@@ -1,6 +1,6 @@
 package theme2
 
-var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
+var List = map[string]string{"login": `{{define "login"}}
     <!DOCTYPE html>
     <!--[if lt IE 7]>
     <html class="no-js lt-ie9 lt-ie8 lt-ie7">

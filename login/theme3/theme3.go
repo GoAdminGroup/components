@@ -13,7 +13,7 @@ func (*Theme3) GetAsset(name string) ([]byte, error) {
 }
 
 func (*Theme3) GetHTML() string {
-	return List["login/theme1"]
+	return List["login"]
 }
 
 func init() {

@@ -1,6 +1,6 @@
 package theme1
 
-var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
+var List = map[string]string{"login": `{{define "login"}}
     <!DOCTYPE html>
     <html>
     <head>
