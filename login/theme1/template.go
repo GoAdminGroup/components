@@ -164,3 +164,8 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
     </html>
 {{end}}
 `}
+
+const (
+	DefaultBackgroundColor = "#2d3a4b"
+	DefaultLoginBtnColor   = "#6a83a2"
+)

@@ -105,13 +105,13 @@ func Get(cfg ...Config) *Login {
 
 		return &Login{
 			TencentWaterProofWallData: cfg[0].TencentWaterProofWallData,
-			BackgroundColor:           utils.SetDefault(cfg[0].BackgroundColor, "", "#2d3a4b"),
-			LoginBtnColor:             utils.SetDefault(cfg[0].LoginBtnColor, "", "#6a83a2"),
+			BackgroundColor:           utils.SetDefault(cfg[0].BackgroundColor, "", theme1.DefaultBackgroundColor),
+			LoginBtnColor:             utils.SetDefault(cfg[0].LoginBtnColor, "", theme1.DefaultLoginBtnColor),
 			CaptchaDigits:             cfg[0].CaptchaDigits,
 			Theme:                     cfg[0].Theme,
 		}
 	}
-	return &Login{BackgroundColor: "#2d3a4b", LoginBtnColor: "#6a83a2", Theme: 0}
+	return &Login{BackgroundColor: theme1.DefaultBackgroundColor, LoginBtnColor: theme1.DefaultLoginBtnColor, Theme: 0}
 }
 
 func byteToStr(b []byte) string {
