@@ -14,7 +14,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
         <style>
             body.login-page {
-                background-color: {% .BackgroundColor %};
+                background-color: #2d3a4b;
                 height: 80%;
             }
 
@@ -31,7 +31,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
             }
 
             button.btn.btn-flat {
-                background-color: {% .LoginBtnColor %};
+                background-color: #6a83a2;
             }
 
             .captcha {
@@ -94,9 +94,9 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
     <script src="{{link .CdnUrl .UrlPrefix "/assets/login/dist/all.min.js"}}"></script>
     <script>
 
-        {% if .TencentWaterProofWallID  %}
+        {% if .TencentWaterProofWallData.ID  %}
 
-        let captcha = new TencentCaptcha("{% .TencentWaterProofWallID %}", function (res) {
+        let captcha = new TencentCaptcha("{% .TencentWaterProofWallData.ID %}", function (res) {
             console.log(res);
             // res（用户主动关闭验证码）= {ret: 2, ticket: null}
             // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
@@ -135,7 +135,7 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
 
         $("#sign-in-form").submit(function (e) {
             e.preventDefault();
-            {% if .TencentWaterProofWallID  %}
+            {% if .TencentWaterProofWallData.ID  %}
             captcha.show();
             {% else  %}
             $.ajax({
@@ -164,8 +164,3 @@ var List = map[string]string{"login/theme1": `{{define "login_theme1"}}
     </html>
 {{end}}
 `}
-
-const (
-	DefaultBackgroundColor = "#2d3a4b"
-	DefaultLoginBtnColor   = "#6a83a2"
-)

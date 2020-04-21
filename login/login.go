@@ -4,26 +4,39 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"github.com/GoAdminGroup/components/login/theme1"
-	"github.com/GoAdminGroup/go-admin/modules/logger"
-	"github.com/GoAdminGroup/go-admin/modules/utils"
-	captcha2 "github.com/GoAdminGroup/go-admin/plugins/admin/modules/captcha"
-	"github.com/GoAdminGroup/go-admin/template/login"
-	"github.com/dchest/captcha"
 	"html/template"
 	"strings"
 	textTemplate "text/template"
 	"time"
+
+	"github.com/GoAdminGroup/components/login/theme1"
+	"github.com/GoAdminGroup/go-admin/modules/logger"
+	"github.com/GoAdminGroup/go-admin/modules/utils"
+	captcha2 "github.com/GoAdminGroup/go-admin/plugins/admin/modules/captcha"
+	template2 "github.com/GoAdminGroup/go-admin/template"
+	"github.com/GoAdminGroup/go-admin/template/login"
+	"github.com/dchest/captcha"
 )
+
+var themes = make(map[string]Theme)
+
+func init() {
+	Register("theme1", new(theme1.Theme1))
+}
+
+func Register(key string, theme Theme) {
+	if _, ok := themes[key]; ok {
+		panic("duplicate login theme")
+	}
+	themes[key] = theme
+}
 
 type Login struct {
 	TencentWaterProofWallData TencentWaterProofWallData
-	BackgroundColor           string
-	LoginBtnColor             string
 	CaptchaDigits             int
 	CaptchaID                 string
 	CaptchaImgSrc             string
-	Theme                     int
+	Theme                     string
 }
 
 type TencentWaterProofWallData struct {
@@ -34,10 +47,8 @@ type TencentWaterProofWallData struct {
 
 type Config struct {
 	TencentWaterProofWallData TencentWaterProofWallData
-	LoginBtnColor             string
-	BackgroundColor           string
 	CaptchaDigits             int
-	Theme                     int
+	Theme                     string
 }
 
 const (
@@ -91,6 +102,10 @@ func (c *TencentCaptcha) Validate(token string) bool {
 	return true
 }
 
+func Init(cfg ...Config) {
+	template2.AddLoginComp(Get(cfg...))
+}
+
 func Get(cfg ...Config) *Login {
 	if len(cfg) > 0 {
 
@@ -103,15 +118,17 @@ func Get(cfg ...Config) *Login {
 			captcha2.Add(CaptchaDriverKeyTencent, new(TencentCaptcha))
 		}
 
+		if cfg[0].Theme == "" {
+			cfg[0].Theme = "theme1"
+		}
+
 		return &Login{
 			TencentWaterProofWallData: cfg[0].TencentWaterProofWallData,
-			BackgroundColor:           utils.SetDefault(cfg[0].BackgroundColor, "", theme1.DefaultBackgroundColor),
-			LoginBtnColor:             utils.SetDefault(cfg[0].LoginBtnColor, "", theme1.DefaultLoginBtnColor),
 			CaptchaDigits:             cfg[0].CaptchaDigits,
 			Theme:                     cfg[0].Theme,
 		}
 	}
-	return &Login{BackgroundColor: theme1.DefaultBackgroundColor, LoginBtnColor: theme1.DefaultLoginBtnColor, Theme: 0}
+	return &Login{Theme: "theme1"}
 }
 
 func byteToStr(b []byte) string {
@@ -140,7 +157,7 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 	}
 
 	t := textTemplate.New("login_theme1").Delims("{%", "%}")
-	t, err := t.Parse(theme1.List["login/theme1"])
+	t, err := t.Parse(themes[l.Theme].GetHTML())
 	if err != nil {
 		logger.Error("login component, get template parse error: ", err)
 	}
@@ -161,8 +178,8 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 	return tmpl, "login_theme1"
 }
 
-func (l *Login) GetAssetList() []string               { return theme1.AssetsList }
-func (l *Login) GetAsset(name string) ([]byte, error) { return theme1.Asset(name[1:]) }
+func (l *Login) GetAssetList() []string               { return themes[l.Theme].GetAssetList() }
+func (l *Login) GetAsset(name string) ([]byte, error) { return themes[l.Theme].GetAsset(name[1:]) }
 func (l *Login) GetName() string                      { return "login" }
 func (l *Login) IsAPage() bool                        { return true }
 
@@ -174,4 +191,10 @@ func (l *Login) GetContent() template.HTML {
 		logger.Error("login component, compose html error:", err)
 	}
 	return template.HTML(buffer.String())
+}
+
+type Theme interface {
+	GetAssetList() []string
+	GetAsset(name string) ([]byte, error)
+	GetHTML() string
 }
