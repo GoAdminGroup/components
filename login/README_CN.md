@@ -1,10 +1,10 @@
-# GoAdmin Login Theme Components
+# GoAdmin登录页面组件
 
-Offers a variety of default login page theme, and the ways of verification code.
+提供多种预设登录页面主题，以及验证码方式。
 
-## How To
+## 使用
 
-The following code shows how to use the login module, please pay attention to the relevant comments.
+以下代码展示如何使用登录组件，请留意相关注释。
 
 ```golang
 package main
@@ -13,7 +13,7 @@ import (
 	_ "github.com/GoAdminGroup/go-admin/adapter/gin"	    
     _ "github.com/GoAdminGroup/go-admin/adapter/gin"
     _ "github.com/GoAdminGroup/go-admin/modules/db/drivers/mysql"
-    // import the theme2 login theme, if you don`t use, don`t import
+    // 引入theme2登录页面主题，如不用，可以不导入
     _ "github.com/GoAdminGroup/components/login/theme2"
 	
 	"github.com/GoAdminGroup/components/login"
@@ -34,14 +34,14 @@ func main() {
 	adminPlugin := admin.NewAdmin(datamodel.Generators)
 	adminPlugin.AddGenerator("user", datamodel.GetUserTable)
 	
-	// load the CAPTCHA driver if you use it
+	// 载入对应验证码驱动，如没使用不用载入
 	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})
 
-    // use the login theme component
+    // 使用登录页面组件
     login.Init(login.Config{
-        Theme: "theme2", // theme name
-        CaptchaDigits: 5, // Use captcha images, here on behalf of how many authentication code Numbers
-        // Use tencent verification code, need to offer appID and appSecret
+        Theme: "theme2",
+        CaptchaDigits: 5, // 使用图片验证码，这里代表多少个验证码数字
+        // 使用腾讯验证码，需提供appID与appSecret
         // TencentWaterProofWallData: login.TencentWaterProofWallData{
         //    AppID:"",
         //    AppSecret: "",
