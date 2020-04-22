@@ -33,9 +33,6 @@ func main() {
 	eng := engine.Default()
 	adminPlugin := admin.NewAdmin(datamodel.Generators)
 	adminPlugin.AddGenerator("user", datamodel.GetUserTable)
-	
-	// load the CAPTCHA driver if you use it
-	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})
 
         // use the login theme component
         login.Init(login.Config{
@@ -53,6 +50,9 @@ func main() {
 		Use(r); err != nil {
 		panic(err)
 	}
+	
+	// load the CAPTCHA driver if you use it
+	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})	
 
 	r.Static("/uploads", "./uploads")
 
