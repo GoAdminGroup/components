@@ -160,6 +160,7 @@ var List = map[string]string{"login": `{{define "login"}}
             },
             error: function (data) {
                 alert(data.responseJSON.msg);
+				location.reload();
             }
         });
             {% end %}

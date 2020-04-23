@@ -156,6 +156,7 @@
                 },
                 error: function (data) {
                     alert(data.responseJSON.msg);
+                    location.reload();
                 }
             });
             {% end %}
