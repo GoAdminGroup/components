@@ -1,8 +1,13 @@
 package theme3
 
-import "github.com/GoAdminGroup/components/login"
+import (
+	"github.com/GoAdminGroup/components/login"
+	"github.com/GoAdminGroup/go-admin/template"
+)
 
-type Theme3 struct{}
+type Theme3 struct{
+	*template.BaseComponent
+}
 
 func (*Theme3) GetAssetList() []string {
 	return AssetsList

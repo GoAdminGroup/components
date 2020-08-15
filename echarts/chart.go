@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	template2 "github.com/GoAdminGroup/go-admin/template"
 	"github.com/go-echarts/go-echarts/charts"
 	"github.com/go-echarts/go-echarts/datasets"
 	"github.com/go-echarts/go-echarts/templates"
@@ -13,6 +14,7 @@ import (
 )
 
 type Chart struct {
+	*template2.BaseComponent
 	Content interface{}
 }
 
@@ -39,39 +41,25 @@ func (c *Chart) GetTemplate() (*template.Template, string) {
 	return nil, "echarts"
 }
 
-func (c *Chart) GetAssetList() []string {
-	return AssetsList
-}
-
-func (c *Chart) GetAsset(name string) ([]byte, error) {
-	return Asset(name[1:])
-}
-
-func (c *Chart) IsAPage() bool {
-	return false
-}
-
-func (c *Chart) GetName() string {
-	return "echarts"
-}
+func (c *Chart) GetAssetList() []string               { return AssetsList }
+func (c *Chart) GetAsset(name string) ([]byte, error) { return Asset(name[1:]) }
+func (c *Chart) GetName() string                      { return "echarts" }
 
 func (c *Chart) GetContent() template.HTML {
 
 	buf, chartId := c.getContent()
 
-	content := buf.String()
+	repl := strings.NewReplacer(`<meta charset="utf-8">`, "",
+		`<title>Awesome go-echarts</title>`, "",
+		`<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>`, "",
+		`<script src="https://go-echarts.github.io/go-echarts-assets/assets/maps/china.js"></script>`, "",
+		`<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-gl.min.js"></script>`, "",
+		`<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-liquidfill.min.js"></script>`, "",
+		`<link href="https://go-echarts.github.io/go-echarts-assets/assets/bulma.min.css" rel="stylesheet">`, "",
+		`<div class="select" style="margin-right:10px; margin-top:10px; position:fixed; right:10px;"></div>`, "",
+		`container`, "echarts-container")
 
-	content = strings.Replace(content, `<meta charset="utf-8">`, "", -1)
-	content = strings.Replace(content, `<title>Awesome go-echarts</title>`, "", -1)
-	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>`, "", -1)
-	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/maps/china.js"></script>`, "", -1)
-	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-gl.min.js"></script>`, "", -1)
-	content = strings.Replace(content, `<script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-liquidfill.min.js"></script>`, "", -1)
-	content = strings.Replace(content, `<link href="https://go-echarts.github.io/go-echarts-assets/assets/bulma.min.css" rel="stylesheet">`, "", -1)
-	content = strings.Replace(content, `<div class="select" style="margin-right:10px; margin-top:10px; position:fixed; right:10px;"></div>`, "", - 1)
-	content = strings.Replace(content, `container`, "echarts-container", - 1)
-
-	return template.HTML(content) + template.HTML(fmt.Sprintf(resizeJS, chartId))
+	return template.HTML(repl.Replace(buf.String())) + template.HTML(fmt.Sprintf(resizeJS, chartId))
 }
 
 func (c *Chart) GetOptions() template.JS {
