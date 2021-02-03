@@ -20,6 +20,7 @@ import (
 	"github.com/GoAdminGroup/go-admin/engine"
 	"github.com/GoAdminGroup/go-admin/examples/datamodel"
 	"github.com/GoAdminGroup/go-admin/plugins/admin"
+	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/captcha"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
