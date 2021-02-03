@@ -20,6 +20,7 @@ import (
 	"github.com/GoAdminGroup/go-admin/engine"
 	"github.com/GoAdminGroup/go-admin/examples/datamodel"
 	"github.com/GoAdminGroup/go-admin/plugins/admin"
+	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/captcha"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
@@ -52,7 +53,9 @@ func main() {
 	}
 	
 	// load the CAPTCHA driver if you use it
-	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})	
+	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})
+	captcha.Add(login.CaptchaDriverKeyDefault, new(login.DigitsCaptcha))
+	// captcha.Add(login.CaptchaDriverKeyDefault, new(login.TencentCaptcha))
 
 	r.Static("/uploads", "./uploads")
 

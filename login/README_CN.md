@@ -52,7 +52,9 @@ func main() {
 	}
 	
 	// 载入对应验证码驱动，如没使用不用载入
-	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})	
+	adminPlugin.SetCaptcha(map[string]string{"driver": login.CaptchaDriverKeyDefault})
+	captcha.Add(login.CaptchaDriverKeyDefault, new(login.DigitsCaptcha))
+	// captcha.Add(login.CaptchaDriverKeyDefault, new(login.TencentCaptcha))		
 
 	r.Static("/uploads", "./uploads")
 
