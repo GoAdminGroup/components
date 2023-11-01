@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"html/template"
-	"sync"
 	textTemplate "text/template"
 	"time"
 
@@ -23,7 +22,6 @@ var (
 	themes = map[string]Theme{
 		"theme1": new(theme1.Theme1),
 	}
-	captchaMu sync.Mutex
 )
 
 func Register(key string, theme Theme) {
@@ -96,7 +94,6 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 
 	if l.CaptchaDigits != 0 {
 		captchaMu.Lock()
-
 		id := utils.Uuid(10)
 		digitByte := captcha.RandomDigits(l.CaptchaDigits)
 		captchaData[id] = CaptchaDataItem{
