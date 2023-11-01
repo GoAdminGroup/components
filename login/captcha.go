@@ -2,12 +2,14 @@ package login
 
 import (
 	"encoding/json"
-	"github.com/GoAdminGroup/go-admin/modules/logger"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/GoAdminGroup/go-admin/modules/logger"
 )
 
 const (
@@ -25,7 +27,11 @@ type CaptchaDataItem struct {
 
 type CaptchaData map[string]CaptchaDataItem
 
+var captchaMu sync.Mutex
+
 func (c *CaptchaData) Clean() {
+	captchaMu.Lock()
+	defer captchaMu.Unlock()
 	for key, value := range *c {
 		if value.Time.Add(CaptchaDisableDuration).Before(time.Now()) {
 			delete(*c, key)
@@ -38,6 +44,8 @@ var captchaData = make(CaptchaData)
 type DigitsCaptcha struct{}
 
 func (c *DigitsCaptcha) Validate(token string) bool {
+	captchaMu.Lock()
+	defer captchaMu.Unlock()
 	tokenArr := strings.Split(token, ",")
 	if len(tokenArr) < 2 {
 		return false

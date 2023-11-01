@@ -14,13 +14,15 @@ import (
 	captcha2 "github.com/GoAdminGroup/go-admin/plugins/admin/modules/captcha"
 	template2 "github.com/GoAdminGroup/go-admin/template"
 	"github.com/GoAdminGroup/go-admin/template/login"
-	"github.com/dchest/captcha"
 	"github.com/GoAdminGroup/go-admin/template/types"
+	"github.com/dchest/captcha"
 )
 
-var themes = map[string]Theme{
-	"theme1": new(theme1.Theme1),
-}
+var (
+	themes = map[string]Theme{
+		"theme1": new(theme1.Theme1),
+	}
+)
 
 func Register(key string, theme Theme) {
 	if _, ok := themes[key]; ok {
@@ -91,6 +93,7 @@ func byteToStr(b []byte) string {
 func (l *Login) GetTemplate() (*template.Template, string) {
 
 	if l.CaptchaDigits != 0 {
+		captchaMu.Lock()
 		id := utils.Uuid(10)
 		digitByte := captcha.RandomDigits(l.CaptchaDigits)
 		captchaData[id] = CaptchaDataItem{
@@ -103,6 +106,7 @@ func (l *Login) GetTemplate() (*template.Template, string) {
 		_, _ = img.WriteTo(buf)
 		l.CaptchaID = id
 		l.CaptchaImgSrc = "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes())
+		captchaMu.Unlock()
 	}
 
 	t := textTemplate.New("login").Delims("{%", "%}")
@@ -131,9 +135,9 @@ func (l *Login) GetAssetList() []string               { return themes[l.Theme].G
 func (l *Login) GetAsset(name string) ([]byte, error) { return themes[l.Theme].GetAsset(name[1:]) }
 func (l *Login) GetName() string                      { return "login" }
 func (l *Login) IsAPage() bool                        { return true }
-func (l *Login) GetJS() template.JS            				{ return "" }
-func (l *Login) GetCSS() template.CSS          				{ return "" }
-func (l *Login) GetCallbacks() types.Callbacks 				{ return make(types.Callbacks, 0) }
+func (l *Login) GetJS() template.JS                   { return "" }
+func (l *Login) GetCSS() template.CSS                 { return "" }
+func (l *Login) GetCallbacks() types.Callbacks        { return make(types.Callbacks, 0) }
 
 func (l *Login) GetContent() template.HTML {
 	buffer := new(bytes.Buffer)
